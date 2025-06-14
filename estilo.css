@@ -1,0 +1,162 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 2rem;
+  background: #eef1f5;
+  color: #2c3e50;
+  line-height: 1.6;
+  max-width: 960px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  color: #1a1a1a;
+}
+
+.resumen, .formulario, .tabla, .grafico {
+  background: #fff;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.resumen:hover, .formulario:hover, .tabla:hover, .grafico:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+.resumen h2,
+.formulario h2,
+.tabla h2,
+.grafico h2 {
+  margin-bottom: 1.2rem;
+  color: #2c3e50;
+  font-size: 1.4rem;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.4rem;
+}
+
+label {
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  color: #333;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #fcfcfc;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #0077cc;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+button {
+  background-color: #0077cc;
+  color: white;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s;
+  margin-top: 1rem;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  overflow-x: auto;
+  display: block;
+}
+
+th, td {
+  padding: 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: nowrap;
+}
+
+th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #2c3e50;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+canvas {
+  width: 100% !important;
+  max-width: 600px;
+  height: auto !important;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
+  }
+  .resumen, .formulario, .tabla, .grafico {
+    padding: 1rem;
+  }
+  button {
+    font-size: 0.95rem;
+    padding: 0.7rem 1rem;
+  }
+  table, th, td {
+    font-size: 0.9rem;
+  }
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  input, select, textarea {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2rem;
+  }
+  .resumen h2, .formulario h2, .tabla h2, .grafico h2 {
+    font-size: 1.2rem;
+  }
+  input, select, textarea {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.9rem;
+  }
+  button {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+  }
+}
