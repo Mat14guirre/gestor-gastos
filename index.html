@@ -8,6 +8,11 @@
 </head>
 <body>
   <h1>💰 Gestor de Gastos Mensual</h1>
+  <div class="auth-controls">
+    <p id="user-info">No estás logueado</p>
+    <button id="login-btn">Iniciar sesión con Google</button>
+    <button id="logout-btn" style="display:none;">Cerrar sesión</button>
+  </div>
 
   <div class="resumen">
     <h2>Resumen</h2>
@@ -54,5 +59,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/app.js"></script>
+  <script type="module" src="./login.js"></script>
 </body>
 </html>
