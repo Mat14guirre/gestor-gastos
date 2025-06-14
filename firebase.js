@@ -3,12 +3,12 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAaZ57aRF0dlBv2MkLp8rZb2skpJvbEFl8",
-  authDomain: "gastocompartido.firebaseapp.com",
-  projectId: "gastocompartido",
-  storageBucket: "gastocompartido.firebasestorage.app",
-  messagingSenderId: "662478843777",
-  appId: "1:662478843777:web:6d659ddb7a4be42cc5c280"
+  apiKey: import.meta.env.API_KEY,
+  authDomain: import.meta.env.AUTH_DOMAIN,
+  projectId: import.meta.env.PROJECT_ID,
+  storageBucket: import.meta.env.STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
