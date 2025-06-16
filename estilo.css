@@ -1,93 +1,96 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 2rem;
-  background: #eef1f5;
+  background: #f5f7fa;
   color: #2c3e50;
-  line-height: 1.6;
+  margin: 0 auto;
+  padding: 2rem;
   max-width: 960px;
-  margin: auto;
+  line-height: 1.6;
 }
 
 h1 {
   text-align: center;
   margin-bottom: 2rem;
-  font-size: 2.5rem;
-  color: #1a1a1a;
+  font-size: 2.4rem;
+  color: #1e2a38;
+  letter-spacing: 0.5px;
 }
 
-.resumen, .formulario, .tabla, .grafico {
-  background: #fff;
+/* Secciones */
+section {
+  background: #ffffff;
   padding: 2rem;
   margin-bottom: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-  transition: box-shadow 0.2s ease-in-out;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
 }
 
-.resumen:hover, .formulario:hover, .tabla:hover, .grafico:hover {
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+section:hover {
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.06);
 }
 
-.resumen h2,
-.formulario h2,
-.tabla h2,
-.grafico h2 {
+section h2 {
+  font-size: 1.3rem;
   margin-bottom: 1.2rem;
-  color: #2c3e50;
-  font-size: 1.4rem;
-  border-bottom: 2px solid #ddd;
   padding-bottom: 0.4rem;
+  border-bottom: 1px solid #e0e6ed;
+  color: #2d3e50;
 }
 
+/* Formularios */
 label {
   font-weight: 600;
   margin-top: 1rem;
-  margin-bottom: 0.25rem;
+  display: block;
   color: #333;
 }
 
 input, select, textarea {
   width: 100%;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 0.75rem 0.9rem;
+  margin-top: 0.35rem;
   font-size: 1rem;
-  background-color: #fcfcfc;
-  transition: border-color 0.2s;
+  border: 1px solid #ccd6dd;
+  border-radius: 8px;
+  background-color: #fdfdfd;
+  transition: border 0.2s;
   box-sizing: border-box;
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: #0077cc;
+  border-color: #5b9bd5;
 }
 
 textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 90px;
 }
 
+/* Botones */
 button {
-  background-color: #0077cc;
+  margin-top: 1.5rem;
+  background-color: #5b9bd5;
   color: white;
-  padding: 0.8rem 1.2rem;
-  font-size: 1rem;
-  font-weight: 600;
+  padding: 0.8rem 1.6rem;
   border: none;
   border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, transform 0.1s;
-  margin-top: 1rem;
+  transition: background 0.2s, transform 0.1s;
 }
 
 button:hover {
-  background-color: #005fa3;
+  background-color: #4178b8;
 }
 
 button:active {
   transform: scale(0.98);
 }
 
+/* Tabla */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -100,63 +103,74 @@ table {
 th, td {
   padding: 0.85rem;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e6ecf1;
   white-space: nowrap;
 }
 
 th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #2c3e50;
+  background-color: #f3f6fa;
   text-transform: uppercase;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #444e59;
 }
 
+/* Gráfico */
 canvas {
   width: 100% !important;
   max-width: 600px;
   height: auto !important;
   margin-top: 1rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
   body {
     padding: 1rem;
   }
-  .resumen, .formulario, .tabla, .grafico {
+
+  section {
     padding: 1rem;
   }
-  button {
-    font-size: 0.95rem;
-    padding: 0.7rem 1rem;
+
+  h1 {
+    font-size: 2rem;
   }
-  table, th, td {
-    font-size: 0.9rem;
-  }
-  table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
+
   input, select, textarea {
     font-size: 0.95rem;
-    padding: 0.5rem 0.6rem;
+    padding: 0.65rem;
+  }
+
+  button {
+    font-size: 0.95rem;
+    padding: 0.7rem 1.2rem;
+  }
+
+  table, th, td {
+    font-size: 0.9rem;
   }
 }
 
 @media (max-width: 480px) {
   h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
-  .resumen h2, .formulario h2, .tabla h2, .grafico h2 {
-    font-size: 1.2rem;
+
+  section h2 {
+    font-size: 1.1rem;
   }
-  input, select, textarea {
-    padding: 0.5rem 0.6rem;
-    font-size: 0.9rem;
-  }
+
   button {
     font-size: 0.9rem;
     padding: 0.6rem 1rem;
+  }
+
+  input, select, textarea {
+    font-size: 0.9rem;
+    padding: 0.6rem;
   }
 }

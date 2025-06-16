@@ -3,31 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gestor de Gastos Mensual</title>
-  <link rel="stylesheet" href="./estilos.css" />
+  <title>Gestor de Gastos</title>
+  <link rel="stylesheet" href="estilo.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>💰 Gestor de Gastos Mensual</h1>
+  <h1>💸 Gestor de Gastos</h1>
 
   <section class="resumen">
     <h2>Resumen</h2>
     <label for="ingreso">Ingreso mensual:</label>
-    <input type="number" id="ingreso" value="1850000" />
+    <input type="number" id="ingreso" value="0" />
 
     <label for="meta">Meta de ahorro:</label>
-    <input type="number" id="meta" value="300000" />
+    <input type="number" id="meta" value="0" />
 
     <p><strong>Total Gastado:</strong> $<span id="totalGasto">0</span></p>
     <p><strong>Ahorro Real:</strong> $<span id="ahorroReal">0</span></p>
     <p><strong>Meta Cumplida:</strong> <span id="cumplida">❌</span></p>
 
-    <button id="reiniciar-btn">🧹 Reiniciar todo (mes nuevo)</button>
+    <button id="reiniciar-btn">🧹 Reiniciar gastos</button>
   </section>
 
   <section class="formulario">
     <h2>Agregar Gasto</h2>
-    
+
     <label for="fecha">Fecha:</label>
     <input type="date" id="fecha" />
 
@@ -65,6 +65,7 @@
           <th>Monto</th>
           <th>Método</th>
           <th>Obs.</th>
+          <th></th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -72,10 +73,10 @@
   </section>
 
   <section class="grafico">
-    <h2>Distribución por Categoría</h2>
+    <h2>Gráfico por Categoría</h2>
     <canvas id="graficoGastos"></canvas>
   </section>
 
-  <script src="./app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
