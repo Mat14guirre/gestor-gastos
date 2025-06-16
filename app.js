@@ -323,21 +323,25 @@ agregarBtn.addEventListener("click", () => {
 
 // Reiniciar datos
 reiniciarBtn.addEventListener("click", async () => {
-  if (!usuarioActual) {
-    alert("Debes iniciar sesión para reiniciar datos.");
-    return;
-  }
-
   if (!confirm("¿Querés reiniciar todos los gastos y metas para un nuevo mes?")) return;
 
+  // Borrar documentos en Firestore
+  try {
+    const gastosSnapshot = await getDocs(collection(db, "gastos"));
+    const batchDeletePromises = gastosSnapshot.docs.map(docSnap => deleteDoc(doc(db, "gastos", docSnap.id)));
+    await Promise.all(batchDeletePromises);
+    console.log("Gastos borrados de Firestore.");
+  } catch (error) {
+    console.error("Error borrando gastos en Firestore:", error);
+  }
+
+  // Limpiar en memoria y localStorage
   gastos = [];
   guardarGastos();
   localStorage.removeItem("ingreso");
   localStorage.removeItem("meta");
   ingresoInput.value = "";
   metaInput.value = "";
-
-  await borrarIngresoMetaFirestore();
 
   renderTabla();
   actualizarResumen();
