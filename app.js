@@ -40,9 +40,12 @@ function actualizarResumen() {
 
   const ingreso = Number(ingresoInput.value) || 0;
   const meta = Number(metaInput.value) || 0;
+
+  localStorage.setItem("ingreso", ingreso);
+  localStorage.setItem("meta", meta);
+
   const ahorroReal = ingreso - totalGastado;
   ahorroRealSpan.textContent = ahorroReal.toLocaleString();
-
   cumplidaSpan.textContent = ahorroReal >= meta ? "✅" : "❌";
 }
 
@@ -86,14 +89,16 @@ function guardarGastos() {
   localStorage.setItem("gastos", JSON.stringify(gastos));
 }
 
-// Cargar gastos de localStorage
+// Cargar gastos e ingresos/meta de localStorage
 function cargarGastos() {
   const datosGuardados = localStorage.getItem("gastos");
-  if (datosGuardados) {
-    gastos = JSON.parse(datosGuardados);
-  } else {
-    gastos = [];
-  }
+  if (datosGuardados) gastos = JSON.parse(datosGuardados);
+
+  const ingresoGuardado = localStorage.getItem("ingreso");
+  const metaGuardada = localStorage.getItem("meta");
+
+  if (ingresoGuardado) ingresoInput.value = ingresoGuardado;
+  if (metaGuardada) metaInput.value = metaGuardada;
 }
 
 // Agregar gasto
@@ -131,22 +136,27 @@ agregarBtn.addEventListener("click", () => {
   observacionesInput.value = "";
 });
 
-// Reiniciar gastos (borrar todos)
+// Reiniciar datos
 reiniciarBtn.addEventListener("click", () => {
-  if (!confirm("¿Querés reiniciar todos los gastos para un nuevo mes?")) return;
+  if (!confirm("¿Querés reiniciar todos los gastos y metas para un nuevo mes?")) return;
 
   gastos = [];
   guardarGastos();
+  localStorage.removeItem("ingreso");
+  localStorage.removeItem("meta");
+  ingresoInput.value = "";
+  metaInput.value = "";
+
   renderTabla();
   actualizarResumen();
   actualizarGrafico();
 });
 
-// Actualizar resumen si cambian ingresos o meta
+// Guardar ingreso y meta cuando cambian
 ingresoInput.addEventListener("change", actualizarResumen);
 metaInput.addEventListener("change", actualizarResumen);
 
-// Cargar y mostrar gastos al cargar la página
+// Cargar datos al iniciar
 document.addEventListener("DOMContentLoaded", () => {
   cargarGastos();
   renderTabla();
