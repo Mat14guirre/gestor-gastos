@@ -16,26 +16,39 @@ const tablaBody = document.querySelector("#tablaGastos tbody");
 
 let gastos = [];
 
-// Función para renderizar tabla
+// Cargar desde localStorage al iniciar
+document.addEventListener("DOMContentLoaded", () => {
+  const datosGuardados = localStorage.getItem("gastos");
+  if (datosGuardados) {
+    gastos = JSON.parse(datosGuardados);
+  }
+  renderTabla();
+  actualizarResumen();
+  actualizarGrafico();
+});
+
+// Guardar en localStorage
+function guardarEnLocalStorage() {
+  localStorage.setItem("gastos", JSON.stringify(gastos));
+}
+
+// Renderizar tabla
 function renderTabla() {
   tablaBody.innerHTML = "";
   gastos.forEach(gasto => {
     const tr = document.createElement("tr");
-
     tr.innerHTML = `
       <td>${gasto.fecha}</td>
       <td>${gasto.categoria}</td>
-      <td>$${gasto.monto}</td>
+      <td>$${Number(gasto.monto).toLocaleString()}</td>
       <td>${gasto.metodo}</td>
       <td>${gasto.observaciones}</td>
-      <td>${gasto.usuarioNombre}</td>
     `;
-
     tablaBody.appendChild(tr);
   });
 }
 
-// Calcular totales y actualizar resumen
+// Actualizar resumen
 function actualizarResumen() {
   const totalGastado = gastos.reduce((acc, g) => acc + Number(g.monto), 0);
   totalGastoSpan.textContent = totalGastado.toLocaleString();
@@ -48,47 +61,8 @@ function actualizarResumen() {
   cumplidaSpan.textContent = ahorroReal >= meta ? "✅" : "❌";
 }
 
-// Guardar gasto en Firestore
-function guardarGastoFirestore(gasto) {
-  if (!window.usuarioActivo) {
-    alert("Debes iniciar sesión para agregar gastos");
-    return;
-  }
-  db.collection("gastos").add(gasto)
-    .then(() => {
-      console.log("Gasto guardado en Firestore");
-    })
-    .catch((error) => {
-      console.error("Error guardando gasto:", error);
-      alert("Error guardando gasto: " + error.message);
-    });
-}
-
-// Cargar gastos de Firestore para usuario activo
-function cargarGastosFirestore() {
-  if (!window.usuarioActivo) return;
-
-  db.collection("gastos")
-    .where("usuarioUid", "==", window.usuarioActivo.uid)
-    .orderBy("fecha", "desc")
-    .onSnapshot((querySnapshot) => {
-      gastos = [];
-      querySnapshot.forEach((doc) => {
-        gastos.push(doc.data());
-      });
-      renderTabla();
-      actualizarResumen();
-      actualizarGrafico();
-    });
-}
-
-// Función para agregar gasto desde formulario
+// Agregar gasto
 agregarBtn.addEventListener("click", () => {
-  if (!window.usuarioActivo) {
-    alert("Debes iniciar sesión para agregar gastos");
-    return;
-  }
-
   const fecha = fechaInput.value;
   const categoria = categoriaSelect.value;
   const monto = parseFloat(montoInput.value);
@@ -100,20 +74,12 @@ agregarBtn.addEventListener("click", () => {
     return;
   }
 
-  const gasto = {
-    fecha,
-    categoria,
-    monto,
-    metodo,
-    observaciones,
-    usuarioUid: window.usuarioActivo.uid,
-    usuarioNombre: window.usuarioActivo.nombre
-  };
-
+  const gasto = { fecha, categoria, monto, metodo, observaciones };
   gastos.push(gasto);
+  guardarEnLocalStorage();
   renderTabla();
   actualizarResumen();
-  guardarGastoFirestore(gasto);
+  actualizarGrafico();
 
   // Limpiar formulario
   fechaInput.value = "";
@@ -122,45 +88,22 @@ agregarBtn.addEventListener("click", () => {
   observacionesInput.value = "";
 });
 
-// Reiniciar gastos
+// Reiniciar
 reiniciarBtn.addEventListener("click", () => {
-  if (!window.usuarioActivo) {
-    alert("Debes iniciar sesión para reiniciar");
-    return;
-  }
-  // Confirmar
-  if (!confirm("¿Querés reiniciar todos los gastos para un nuevo mes?")) return;
-
-  // Borrar en Firestore todos los gastos del usuario
-  db.collection("gastos")
-    .where("usuarioUid", "==", window.usuarioActivo.uid)
-    .get()
-    .then((querySnapshot) => {
-      const batch = db.batch();
-      querySnapshot.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-      return batch.commit();
-    })
-    .then(() => {
-      gastos = [];
-      renderTabla();
-      actualizarResumen();
-      actualizarGrafico();
-      alert("Gastos reiniciados");
-    })
-    .catch((error) => {
-      console.error("Error reiniciando gastos:", error);
-      alert("Error reiniciando gastos: " + error.message);
-    });
+  if (!confirm("¿Querés reiniciar todos los gastos?")) return;
+  gastos = [];
+  guardarEnLocalStorage();
+  renderTabla();
+  actualizarResumen();
+  actualizarGrafico();
+  alert("Gastos reiniciados");
 });
 
-// GRAFICO CON CHART.JS
+// Gráfico con Chart.js
 const ctx = document.getElementById("graficoGastos").getContext("2d");
 let chart;
 
 function actualizarGrafico() {
-  // Agrupar gastos por categoría
   const dataCategorias = {};
   gastos.forEach(gasto => {
     if (!dataCategorias[gasto.categoria]) dataCategorias[gasto.categoria] = 0;
@@ -187,27 +130,12 @@ function actualizarGrafico() {
     options: {
       responsive: true,
       plugins: {
-        legend: {
-          position: 'bottom',
-        }
+        legend: { position: 'bottom' }
       }
     }
   });
 }
 
-// Actualizar gráfico si cambian ingresos o meta
-ingresoInput.addEventListener("change", actualizarResumen);
-metaInput.addEventListener("change", actualizarResumen);
-
-// Cargar gastos al iniciar sesión
-document.addEventListener("DOMContentLoaded", () => {
-  // Espera que usuarioActivo esté definido por login.js
-  const checkUserInterval = setInterval(() => {
-    if (window.usuarioActivo !== undefined) {
-      clearInterval(checkUserInterval);
-      if (window.usuarioActivo) {
-        cargarGastosFirestore();
-      }
-    }
-  }, 200);
-});
+// Escuchar cambios ingreso y meta
+ingresoInput.addEventListener("input", actualizarResumen);
+metaInput.addEventListener("input", actualizarResumen);
