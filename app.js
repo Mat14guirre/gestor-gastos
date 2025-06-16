@@ -179,23 +179,7 @@ reiniciarBtn.addEventListener("click", () => {
 ingresoInput.addEventListener("change", actualizarResumen);
 metaInput.addEventListener("change", actualizarResumen);
 
-async function testGuardar() {
-  try {
-    const docRef = await addDoc(collection(db, "gastos"), {
-      fecha: "2025-06-16",
-      categoria: "Test",
-      monto: 123,
-      metodo: "Test método",
-      observaciones: "Test observaciones",
-      usuarioNombre: "TestUser"
-    });
-    console.log("Documento guardado con ID: ", docRef.id);
-  } catch (e) {
-    console.error("Error guardando documento: ", e);
-  }
-}
 
-testGuardar();
 // Cargar datos al iniciar la página
 document.addEventListener("DOMContentLoaded", () => {
   cargarGastosDesdeFirestore(); // Aquí llamamos a la función que carga desde Firestore
