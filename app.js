@@ -151,14 +151,28 @@ async function cargarGastosDesdeFirestore() {
     gastos.push(doc.data());
   });
 
-  // --- NUEVO: cargar ingreso y meta desde Firestore ---
-  await cargarIngresoMetaFirestore();
-
-  // Cargar ingreso y meta desde localStorage (fallback)
-  const ingresoGuardado = localStorage.getItem("ingreso");
-  const metaGuardada = localStorage.getItem("meta");
-  if (ingresoGuardado) ingresoInput.value = ingresoGuardado;
-  if (metaGuardada) metaInput.value = metaGuardada;
+  // Intentar cargar ingreso y meta desde Firestore
+  try {
+    const docSnap = await getDoc(ingresoMetaDocRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      ingresoInput.value = data.ingreso || 0;
+      metaInput.value = data.meta || 0;
+    } else {
+      // Si no hay en Firestore, cargar desde localStorage
+      const ingresoGuardado = localStorage.getItem("ingreso");
+      const metaGuardada = localStorage.getItem("meta");
+      if (ingresoGuardado) ingresoInput.value = ingresoGuardado;
+      if (metaGuardada) metaInput.value = metaGuardada;
+    }
+  } catch (error) {
+    console.error("Error cargando ingreso/meta:", error);
+    // fallback a localStorage
+    const ingresoGuardado = localStorage.getItem("ingreso");
+    const metaGuardada = localStorage.getItem("meta");
+    if (ingresoGuardado) ingresoInput.value = ingresoGuardado;
+    if (metaGuardada) metaInput.value = metaGuardada;
+  }
 
   renderTabla();
   actualizarResumen();
