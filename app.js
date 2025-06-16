@@ -43,15 +43,27 @@ const allowedEmails = ["matias.aguirre269@gmail.com", "florsaucedoo@gmail.com"];
 
 // Función para actualizar UI según usuario logueado o no
 function updateUI(user) {
+  const saludoDiv = document.getElementById("saludo");
   if (user) {
     if (!allowedEmails.includes(user.email)) {
       alert("No estás autorizado para usar esta app.");
       signOut(auth);
       usuarioActual = null;
       bloquearApp();
+      saludoDiv.textContent = "";
       return;
     }
     usuarioActual = user;
+
+    // 👋 Saludo personalizado
+    if (user.email === "matias.aguirre269@gmail.com") {
+      saludoDiv.innerHTML = `<span style="color: blue;">Hola Mati</span>`;
+    } else if (user.email === "florsaucedoo@gmail.com") {
+      saludoDiv.innerHTML = `<span style="color: pink;">Hola Flor</span>`;
+    } else {
+      saludoDiv.textContent = "";
+    }
+
     loginBtn.style.display = "none";
     logoutBtn.style.display = "inline-block";
     habilitarApp();
@@ -61,6 +73,7 @@ function updateUI(user) {
     loginBtn.style.display = "inline-block";
     logoutBtn.style.display = "none";
     bloquearApp();
+    saludoDiv.textContent = ""; // limpiar saludo
   }
 }
 
