@@ -16,6 +16,33 @@ h1 {
   letter-spacing: 0.5px;
 }
 
+.saludo {
+  font-size: 1.4rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  display: inline-block;
+  animation: fadeIn 0.6s ease-in-out;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.8rem;
+}
+
+.saludo.mati {
+  background-color: #e0f0ff;
+  color: #007bff;
+}
+
+.saludo.flor {
+  background-color: #ffe0f0;
+  color: #d63384;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Secciones */
 section {
   background: #ffffff;
