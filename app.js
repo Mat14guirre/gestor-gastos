@@ -3,155 +3,153 @@ const metaInput = document.getElementById("meta");
 const totalGastoSpan = document.getElementById("totalGasto");
 const ahorroRealSpan = document.getElementById("ahorroReal");
 const cumplidaSpan = document.getElementById("cumplida");
+const reiniciarBtn = document.getElementById("reiniciar-btn");
 
 const fechaInput = document.getElementById("fecha");
-const categoriaInput = document.getElementById("categoria");
+const categoriaSelect = document.getElementById("categoria");
 const montoInput = document.getElementById("monto");
 const metodoInput = document.getElementById("metodo");
 const observacionesInput = document.getElementById("observaciones");
-
 const agregarBtn = document.getElementById("agregar-btn");
-const reiniciarBtn = document.getElementById("reiniciar-btn");
-const tbody = document.querySelector("#tablaGastos tbody");
 
-const ctx = document.getElementById("graficoGastos");
+const tablaBody = document.querySelector("#tablaGastos tbody");
 
-let gastos = JSON.parse(localStorage.getItem("gastos")) || [];
-let ingreso = Number(localStorage.getItem("ingreso")) || 0;
-let meta = Number(localStorage.getItem("meta")) || 0;
+let gastos = [];
 
-ingresoInput.value = ingreso;
-metaInput.value = meta;
-
-// 🎯 Funciones
-function actualizarResumen() {
-  const total = gastos.reduce((acc, g) => acc + g.monto, 0);
-  const ahorro = ingreso - total;
-
-  totalGastoSpan.textContent = total.toFixed(2);
-  ahorroRealSpan.textContent = ahorro.toFixed(2);
-  cumplidaSpan.textContent = ahorro >= meta ? "✅" : "❌";
-
-  localStorage.setItem("ingreso", ingreso);
-  localStorage.setItem("meta", meta);
-}
-
-function renderGastos() {
-  tbody.innerHTML = "";
-  gastos.forEach((gasto, index) => {
+// Renderizar tabla
+function renderTabla() {
+  tablaBody.innerHTML = "";
+  gastos.forEach(gasto => {
     const tr = document.createElement("tr");
-
     tr.innerHTML = `
       <td>${gasto.fecha}</td>
       <td>${gasto.categoria}</td>
-      <td>$${gasto.monto.toFixed(2)}</td>
+      <td>$${Number(gasto.monto).toLocaleString()}</td>
       <td>${gasto.metodo}</td>
-      <td>${gasto.observaciones || ""}</td>
-      <td><button onclick="eliminarGasto(${index})">❌</button></td>
+      <td>${gasto.observaciones}</td>
+      <td>${gasto.usuarioNombre || "Anónimo"}</td>
     `;
-
-    tbody.appendChild(tr);
+    tablaBody.appendChild(tr);
   });
 }
 
-function guardarGastos() {
-  localStorage.setItem("gastos", JSON.stringify(gastos));
+// Actualizar resumen
+function actualizarResumen() {
+  const totalGastado = gastos.reduce((acc, g) => acc + Number(g.monto), 0);
+  totalGastoSpan.textContent = totalGastado.toLocaleString();
+
+  const ingreso = Number(ingresoInput.value) || 0;
+  const meta = Number(metaInput.value) || 0;
+  const ahorroReal = ingreso - totalGastado;
+  ahorroRealSpan.textContent = ahorroReal.toLocaleString();
+
+  cumplidaSpan.textContent = ahorroReal >= meta ? "✅" : "❌";
 }
 
-function eliminarGasto(index) {
-  gastos.splice(index, 1);
-  guardarGastos();
-  renderGastos();
-  actualizarResumen();
-  renderGrafico();
-}
+// Actualizar gráfico (usando Chart.js)
+const ctx = document.getElementById("graficoGastos").getContext("2d");
+let chart;
 
-function renderGrafico() {
-  const categorias = {};
-  gastos.forEach(g => {
-    categorias[g.categoria] = (categorias[g.categoria] || 0) + g.monto;
+function actualizarGrafico() {
+  const dataCategorias = {};
+  gastos.forEach(gasto => {
+    if (!dataCategorias[gasto.categoria]) dataCategorias[gasto.categoria] = 0;
+    dataCategorias[gasto.categoria] += Number(gasto.monto);
   });
 
-  const labels = Object.keys(categorias);
-  const data = Object.values(categorias);
+  const categorias = Object.keys(dataCategorias);
+  const montos = categorias.map(cat => dataCategorias[cat]);
 
-  if (window.chartInstance) {
-    window.chartInstance.destroy();
-  }
+  if (chart) chart.destroy();
 
-  window.chartInstance = new Chart(ctx, {
-    type: "doughnut",
+  chart = new Chart(ctx, {
+    type: "pie",
     data: {
-      labels,
+      labels: categorias,
       datasets: [{
-        label: "Gastos por categoría",
-        data,
+        data: montos,
         backgroundColor: [
-          "#0077cc", "#00b894", "#fdcb6e", "#d63031", "#6c5ce7",
-          "#e17055", "#00cec9", "#fab1a0"
-        ],
-      }],
+          "#f94144", "#f3722c", "#f9844a", "#f9c74f",
+          "#90be6d", "#43aa8b", "#577590", "#277da1"
+        ]
+      }]
     },
     options: {
       responsive: true,
-      plugins: {
-        legend: {
-          position: "bottom"
-        }
-      }
+      plugins: { legend: { position: 'bottom' } }
     }
   });
 }
 
-// 🚀 Eventos
-agregarBtn.addEventListener("click", () => {
-  const gasto = {
-    fecha: fechaInput.value,
-    categoria: categoriaInput.value,
-    monto: parseFloat(montoInput.value),
-    metodo: metodoInput.value,
-    observaciones: observacionesInput.value,
-  };
+// Guardar gastos en localStorage
+function guardarGastos() {
+  localStorage.setItem("gastos", JSON.stringify(gastos));
+}
 
-  if (!gasto.fecha || !gasto.categoria || isNaN(gasto.monto) || gasto.monto <= 0) {
-    alert("Por favor, completá los campos obligatorios.");
+// Cargar gastos de localStorage
+function cargarGastos() {
+  const datosGuardados = localStorage.getItem("gastos");
+  if (datosGuardados) {
+    gastos = JSON.parse(datosGuardados);
+  } else {
+    gastos = [];
+  }
+}
+
+// Agregar gasto
+agregarBtn.addEventListener("click", () => {
+  const fecha = fechaInput.value;
+  const categoria = categoriaSelect.value;
+  const monto = parseFloat(montoInput.value);
+  const metodo = metodoInput.value.trim();
+  const observaciones = observacionesInput.value.trim();
+
+  if (!fecha || !categoria || !monto || monto <= 0) {
+    alert("Por favor completa fecha, categoría y monto válidos.");
     return;
   }
 
+  const gasto = {
+    fecha,
+    categoria,
+    monto,
+    metodo,
+    observaciones,
+    usuarioNombre: "Usuario Local"
+  };
+
   gastos.push(gasto);
   guardarGastos();
-  renderGastos();
+  renderTabla();
   actualizarResumen();
-  renderGrafico();
+  actualizarGrafico();
 
-  // Reset
+  // Limpiar formulario
   fechaInput.value = "";
   montoInput.value = "";
   metodoInput.value = "";
   observacionesInput.value = "";
 });
 
-ingresoInput.addEventListener("input", () => {
-  ingreso = Number(ingresoInput.value);
-  actualizarResumen();
-});
-
-metaInput.addEventListener("input", () => {
-  meta = Number(metaInput.value);
-  actualizarResumen();
-});
-
+// Reiniciar gastos (borrar todos)
 reiniciarBtn.addEventListener("click", () => {
-  if (confirm("¿Seguro que querés borrar todos los gastos?")) {
-    gastos = [];
-    guardarGastos();
-    renderGastos();
-    actualizarResumen();
-    renderGrafico();
-  }
+  if (!confirm("¿Querés reiniciar todos los gastos para un nuevo mes?")) return;
+
+  gastos = [];
+  guardarGastos();
+  renderTabla();
+  actualizarResumen();
+  actualizarGrafico();
 });
 
-// 🔄 Inicializar
-renderGastos();
-actualizarResumen();
-renderGrafico();
+// Actualizar resumen si cambian ingresos o meta
+ingresoInput.addEventListener("change", actualizarResumen);
+metaInput.addEventListener("change", actualizarResumen);
+
+// Cargar y mostrar gastos al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+  cargarGastos();
+  renderTabla();
+  actualizarResumen();
+  actualizarGrafico();
+});
