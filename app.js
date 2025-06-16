@@ -1,3 +1,6 @@
+import { db } from './firebase.js'; // Asegurate que el path esté correcto
+import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 const ingresoInput = document.getElementById("ingreso");
 const metaInput = document.getElementById("meta");
 const totalGastoSpan = document.getElementById("totalGasto");
@@ -89,16 +92,34 @@ function guardarGastos() {
   localStorage.setItem("gastos", JSON.stringify(gastos));
 }
 
-// Cargar gastos e ingresos/meta de localStorage
-function cargarGastos() {
-  const datosGuardados = localStorage.getItem("gastos");
-  if (datosGuardados) gastos = JSON.parse(datosGuardados);
+function guardarGastoEnFirestore(gasto) {
+  addDoc(collection(db, "gastos"), gasto)
+    .then(() => {
+      console.log("Gasto guardado en Firestore");
+    })
+    .catch((error) => {
+      console.error("Error al guardar en Firestore:", error);
+    });
+}
 
+// Cargar gastos desde Firestore
+async function cargarGastosDesdeFirestore() {
+  const gastosSnapshot = await getDocs(collection(db, "gastos"));
+  gastos = [];
+
+  gastosSnapshot.forEach(doc => {
+    gastos.push(doc.data());
+  });
+
+  // Cargar ingreso y meta desde localStorage igual (para mantener lo que el usuario puso)
   const ingresoGuardado = localStorage.getItem("ingreso");
   const metaGuardada = localStorage.getItem("meta");
-
   if (ingresoGuardado) ingresoInput.value = ingresoGuardado;
   if (metaGuardada) metaInput.value = metaGuardada;
+
+  renderTabla();
+  actualizarResumen();
+  actualizarGrafico();
 }
 
 // Agregar gasto
@@ -125,6 +146,7 @@ agregarBtn.addEventListener("click", () => {
 
   gastos.push(gasto);
   guardarGastos();
+  guardarGastoEnFirestore(gasto);
   renderTabla();
   actualizarResumen();
   actualizarGrafico();
@@ -156,10 +178,7 @@ reiniciarBtn.addEventListener("click", () => {
 ingresoInput.addEventListener("change", actualizarResumen);
 metaInput.addEventListener("change", actualizarResumen);
 
-// Cargar datos al iniciar
+// Cargar datos al iniciar la página
 document.addEventListener("DOMContentLoaded", () => {
-  cargarGastos();
-  renderTabla();
-  actualizarResumen();
-  actualizarGrafico();
+  cargarGastosDesdeFirestore(); // Aquí llamamos a la función que carga desde Firestore
 });
