@@ -1,5 +1,5 @@
 import { db } from './firebase.js'; 
-import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, addDoc, getDocs, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const ingresoInput = document.getElementById("ingreso");
 const metaInput = document.getElementById("meta");
@@ -18,6 +18,41 @@ const agregarBtn = document.getElementById("agregar-btn");
 const tablaBody = document.querySelector("#tablaGastos tbody");
 
 let gastos = [];
+
+// --- NUEVAS FUNCIONES para ingreso y meta en Firestore ---
+
+const ingresoMetaDocRef = doc(db, "config", "ingresoMeta");
+
+async function guardarIngresoMetaFirestore(ingreso, meta) {
+  try {
+    await setDoc(ingresoMetaDocRef, { ingreso, meta });
+    console.log("Ingreso y meta guardados en Firestore");
+  } catch (error) {
+    console.error("Error guardando ingreso y meta en Firestore:", error);
+  }
+}
+
+async function cargarIngresoMetaFirestore() {
+  try {
+    const docSnap = await getDoc(ingresoMetaDocRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      ingresoInput.value = data.ingreso || 0;
+      metaInput.value = data.meta || 0;
+    }
+  } catch (error) {
+    console.error("Error cargando ingreso y meta desde Firestore:", error);
+  }
+}
+
+async function borrarIngresoMetaFirestore() {
+  try {
+    await deleteDoc(ingresoMetaDocRef);
+    console.log("Ingreso y meta borrados de Firestore");
+  } catch (error) {
+    console.error("Error borrando ingreso y meta de Firestore:", error);
+  }
+}
 
 // Renderizar tabla
 function renderTabla() {
@@ -44,8 +79,12 @@ function actualizarResumen() {
   const ingreso = Number(ingresoInput.value) || 0;
   const meta = Number(metaInput.value) || 0;
 
+  // Guardar en localStorage (opcional, puede quedarse para fallback)
   localStorage.setItem("ingreso", ingreso);
   localStorage.setItem("meta", meta);
+
+  // --- NUEVO: guardar ingreso y meta en Firestore ---
+  guardarIngresoMetaFirestore(ingreso, meta);
 
   const ahorroReal = ingreso - totalGastado;
   ahorroRealSpan.textContent = ahorroReal.toLocaleString();
@@ -112,7 +151,10 @@ async function cargarGastosDesdeFirestore() {
     gastos.push(doc.data());
   });
 
-  // Cargar ingreso y meta desde localStorage igual (para mantener lo que el usuario puso)
+  // --- NUEVO: cargar ingreso y meta desde Firestore ---
+  await cargarIngresoMetaFirestore();
+
+  // Cargar ingreso y meta desde localStorage (fallback)
   const ingresoGuardado = localStorage.getItem("ingreso");
   const metaGuardada = localStorage.getItem("meta");
   if (ingresoGuardado) ingresoInput.value = ingresoGuardado;
@@ -160,7 +202,7 @@ agregarBtn.addEventListener("click", () => {
 });
 
 // Reiniciar datos
-reiniciarBtn.addEventListener("click", () => {
+reiniciarBtn.addEventListener("click", async () => {
   if (!confirm("¿Querés reiniciar todos los gastos y metas para un nuevo mes?")) return;
 
   gastos = [];
@@ -169,6 +211,9 @@ reiniciarBtn.addEventListener("click", () => {
   localStorage.removeItem("meta");
   ingresoInput.value = "";
   metaInput.value = "";
+
+  // --- NUEVO: borrar ingreso y meta en Firestore ---
+  await borrarIngresoMetaFirestore();
 
   renderTabla();
   actualizarResumen();
@@ -179,8 +224,7 @@ reiniciarBtn.addEventListener("click", () => {
 ingresoInput.addEventListener("change", actualizarResumen);
 metaInput.addEventListener("change", actualizarResumen);
 
-
 // Cargar datos al iniciar la página
 document.addEventListener("DOMContentLoaded", () => {
-  cargarGastosDesdeFirestore(); // Aquí llamamos a la función que carga desde Firestore
+  cargarGastosDesdeFirestore();
 });
