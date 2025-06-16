@@ -117,6 +117,19 @@ button:active {
   transform: scale(0.98);
 }
 
+.reiniciar-btn{
+  margin-top: 1.5rem;
+  background-color: #ac4848;
+  color: white;
+  padding: 0.4rem 0.9rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
 /* Tabla */
 table {
   width: 100%;
