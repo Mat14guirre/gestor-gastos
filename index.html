@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gestor de Gastos Mensual</title>
-  <link rel="stylesheet" href="/estilo.css">
+
+  <link rel="stylesheet" href="/estilo.css" />
+
+  <!-- Firebase UMD SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <h1>💰 Gestor de Gastos Mensual</h1>
+
   <div class="auth-controls">
     <p id="user-info">No estás logueado</p>
     <button id="login-btn">Iniciar sesión con Google</button>
@@ -16,28 +23,33 @@
 
   <div class="resumen">
     <h2>Resumen</h2>
-    <label>Ingreso mensual: <input type="number" id="ingreso" value="1850000"></label>
-    <label>Meta de ahorro: <input type="number" id="meta" value="300000"></label>
+    <label>Ingreso mensual: <input type="number" id="ingreso" value="1850000" /></label>
+    <label>Meta de ahorro: <input type="number" id="meta" value="300000" /></label>
     <p><strong>Total Gastado:</strong> $<span id="totalGasto">0</span></p>
     <p><strong>Ahorro Real:</strong> $<span id="ahorroReal">0</span></p>
     <p><strong>Meta Cumplida:</strong> <span id="cumplida">❌</span></p>
-    <button onclick="reiniciarDatos()">🧹 Reiniciar todo (mes nuevo)</button>
+    <button id="reiniciar-btn">🧹 Reiniciar todo (mes nuevo)</button>
   </div>
 
   <div class="formulario">
     <h2>Agregar Gasto</h2>
-    <label>Fecha: <input type="date" id="fecha"></label>
+    <label>Fecha: <input type="date" id="fecha" /></label>
     <label>Categoría:
       <select id="categoria">
-        <option>Comida</option><option>Transporte</option><option>Entretenimiento</option>
-        <option>Salud</option><option>Servicios</option><option>Hogar</option>
-        <option>Ahorro</option><option>Otros</option>
+        <option>Comida</option>
+        <option>Transporte</option>
+        <option>Entretenimiento</option>
+        <option>Salud</option>
+        <option>Servicios</option>
+        <option>Hogar</option>
+        <option>Ahorro</option>
+        <option>Otros</option>
       </select>
     </label>
-    <label>Monto: <input type="number" id="monto"></label>
-    <label>Método de pago: <input type="text" id="metodo"></label>
+    <label>Monto: <input type="number" id="monto" /></label>
+    <label>Método de pago: <input type="text" id="metodo" /></label>
     <label>Observaciones: <textarea id="observaciones"></textarea></label>
-    <button onclick="agregarGasto()">Agregar</button>
+    <button id="agregar-btn">Agregar</button>
   </div>
 
   <div class="tabla">
@@ -45,7 +57,12 @@
     <table id="tablaGastos">
       <thead>
         <tr>
-          <th>Fecha</th><th>Categoría</th><th>Monto</th><th>Método</th><th>Obs.</th>
+          <th>Fecha</th>
+          <th>Categoría</th>
+          <th>Monto</th>
+          <th>Método</th>
+          <th>Obs.</th>
+          <th>Usuario</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -56,9 +73,9 @@
     <h2>Distribución por Categoría</h2>
     <canvas id="graficoGastos"></canvas>
   </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="/app.js"></script>
-  <script type="module" src="./login.js"></script>
+
+  <!-- Scripts -->
+  <script src="./login.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
