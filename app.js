@@ -1,6 +1,15 @@
 import { db } from './firebase.js'; 
 import { collection, addDoc, getDocs, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+// --- ELEMENTOS DOM ---
 const ingresoInput = document.getElementById("ingreso");
 const metaInput = document.getElementById("meta");
 const totalGastoSpan = document.getElementById("totalGasto");
@@ -17,10 +26,101 @@ const agregarBtn = document.getElementById("agregar-btn");
 
 const tablaBody = document.querySelector("#tablaGastos tbody");
 
+const loginBtn = document.getElementById("login-btn");
+const logoutBtn = document.getElementById("logout-btn");
+const authButtonsDiv = document.getElementById("auth-buttons");
+
+// --- VARIABLES ---
 let gastos = [];
+let usuarioActual = null;
 
-// --- NUEVAS FUNCIONES para ingreso y meta en Firestore ---
+// --- FIREBASE AUTH ---
+const auth = getAuth();
+const provider = new GoogleAuthProvider();
 
+// Correos permitidos
+const allowedEmails = ["matias.aguirre269@gmail.com", "florsaucedoo@gmail.com"];
+
+// Función para actualizar UI según usuario logueado o no
+function updateUI(user) {
+  if (user) {
+    if (!allowedEmails.includes(user.email)) {
+      alert("No estás autorizado para usar esta app.");
+      signOut(auth);
+      usuarioActual = null;
+      bloquearApp();
+      return;
+    }
+    usuarioActual = user;
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+    habilitarApp();
+    cargarGastosDesdeFirestore();
+  } else {
+    usuarioActual = null;
+    loginBtn.style.display = "inline-block";
+    logoutBtn.style.display = "none";
+    bloquearApp();
+  }
+}
+
+// Bloquear la app (ocultar botones, inputs y tabla)
+function bloquearApp() {
+  ingresoInput.disabled = true;
+  metaInput.disabled = true;
+  fechaInput.disabled = true;
+  categoriaSelect.disabled = true;
+  montoInput.disabled = true;
+  metodoInput.disabled = true;
+  observacionesInput.disabled = true;
+  agregarBtn.disabled = true;
+  reiniciarBtn.disabled = true;
+
+  tablaBody.innerHTML = "";
+  totalGastoSpan.textContent = "0";
+  ahorroRealSpan.textContent = "0";
+  cumplidaSpan.textContent = "❌";
+  if (chart) chart.destroy();
+}
+
+// Habilitar la app para el usuario autorizado
+function habilitarApp() {
+  ingresoInput.disabled = false;
+  metaInput.disabled = false;
+  fechaInput.disabled = false;
+  categoriaSelect.disabled = false;
+  montoInput.disabled = false;
+  metodoInput.disabled = false;
+  observacionesInput.disabled = false;
+  agregarBtn.disabled = false;
+  reiniciarBtn.disabled = false;
+}
+
+// Eventos botones login/logout
+loginBtn.addEventListener("click", () => {
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      const user = result.user;
+      if (!allowedEmails.includes(user.email)) {
+        alert("No estás autorizado para usar esta app.");
+        signOut(auth);
+      }
+    })
+    .catch((error) => {
+      console.error("Error en login:", error);
+    });
+});
+
+logoutBtn.addEventListener("click", () => {
+  signOut(auth);
+});
+
+// Escuchar cambios de auth
+onAuthStateChanged(auth, (user) => {
+  updateUI(user);
+});
+
+// --- FIRESTORE ingreso/meta ---
 const ingresoMetaDocRef = doc(db, "config", "ingresoMeta");
 
 async function guardarIngresoMetaFirestore(ingreso, meta) {
@@ -54,7 +154,7 @@ async function borrarIngresoMetaFirestore() {
   }
 }
 
-// Renderizar tabla
+// --- RENDERIZAR TABLA ---
 function renderTabla() {
   tablaBody.innerHTML = "";
   gastos.forEach(gasto => {
@@ -71,7 +171,7 @@ function renderTabla() {
   });
 }
 
-// Actualizar resumen
+// --- ACTUALIZAR RESUMEN ---
 function actualizarResumen() {
   const totalGastado = gastos.reduce((acc, g) => acc + Number(g.monto), 0);
   totalGastoSpan.textContent = totalGastado.toLocaleString();
@@ -79,11 +179,11 @@ function actualizarResumen() {
   const ingreso = Number(ingresoInput.value) || 0;
   const meta = Number(metaInput.value) || 0;
 
-  // Guardar en localStorage (opcional, puede quedarse para fallback)
+  // Guardar en localStorage (fallback)
   localStorage.setItem("ingreso", ingreso);
   localStorage.setItem("meta", meta);
 
-  // --- NUEVO: guardar ingreso y meta en Firestore ---
+  // Guardar ingreso y meta en Firestore
   guardarIngresoMetaFirestore(ingreso, meta);
 
   const ahorroReal = ingreso - totalGastado;
@@ -91,7 +191,7 @@ function actualizarResumen() {
   cumplidaSpan.textContent = ahorroReal >= meta ? "✅" : "❌";
 }
 
-// Actualizar gráfico (usando Chart.js)
+// --- GRÁFICO ---
 const ctx = document.getElementById("graficoGastos").getContext("2d");
 let chart;
 
@@ -126,7 +226,7 @@ function actualizarGrafico() {
   });
 }
 
-// Guardar gastos en localStorage
+// --- GUARDAR Y CARGAR GASTOS ---
 function guardarGastos() {
   localStorage.setItem("gastos", JSON.stringify(gastos));
 }
@@ -142,8 +242,9 @@ function guardarGastoEnFirestore(gasto) {
     });
 }
 
-// Cargar gastos desde Firestore
 async function cargarGastosDesdeFirestore() {
+  if (!usuarioActual) return; // si no está logueado, no carga nada
+
   const gastosSnapshot = await getDocs(collection(db, "gastos"));
   gastos = [];
 
@@ -151,7 +252,7 @@ async function cargarGastosDesdeFirestore() {
     gastos.push(doc.data());
   });
 
-  // Intentar cargar ingreso y meta desde Firestore
+  // Cargar ingreso y meta
   try {
     const docSnap = await getDoc(ingresoMetaDocRef);
     if (docSnap.exists()) {
@@ -159,7 +260,7 @@ async function cargarGastosDesdeFirestore() {
       ingresoInput.value = data.ingreso || 0;
       metaInput.value = data.meta || 0;
     } else {
-      // Si no hay en Firestore, cargar desde localStorage
+      // fallback localStorage
       const ingresoGuardado = localStorage.getItem("ingreso");
       const metaGuardada = localStorage.getItem("meta");
       if (ingresoGuardado) ingresoInput.value = ingresoGuardado;
@@ -167,7 +268,6 @@ async function cargarGastosDesdeFirestore() {
     }
   } catch (error) {
     console.error("Error cargando ingreso/meta:", error);
-    // fallback a localStorage
     const ingresoGuardado = localStorage.getItem("ingreso");
     const metaGuardada = localStorage.getItem("meta");
     if (ingresoGuardado) ingresoInput.value = ingresoGuardado;
@@ -179,8 +279,14 @@ async function cargarGastosDesdeFirestore() {
   actualizarGrafico();
 }
 
+// --- EVENTOS ---
 // Agregar gasto
 agregarBtn.addEventListener("click", () => {
+  if (!usuarioActual) {
+    alert("Debes iniciar sesión para agregar gastos.");
+    return;
+  }
+
   const fecha = fechaInput.value;
   const categoria = categoriaSelect.value;
   const monto = parseFloat(montoInput.value);
@@ -198,7 +304,7 @@ agregarBtn.addEventListener("click", () => {
     monto,
     metodo,
     observaciones,
-    usuarioNombre: "Usuario Local"
+    usuarioNombre: usuarioActual.displayName || "Usuario"
   };
 
   gastos.push(gasto);
@@ -217,6 +323,11 @@ agregarBtn.addEventListener("click", () => {
 
 // Reiniciar datos
 reiniciarBtn.addEventListener("click", async () => {
+  if (!usuarioActual) {
+    alert("Debes iniciar sesión para reiniciar datos.");
+    return;
+  }
+
   if (!confirm("¿Querés reiniciar todos los gastos y metas para un nuevo mes?")) return;
 
   gastos = [];
@@ -226,7 +337,6 @@ reiniciarBtn.addEventListener("click", async () => {
   ingresoInput.value = "";
   metaInput.value = "";
 
-  // --- NUEVO: borrar ingreso y meta en Firestore ---
   await borrarIngresoMetaFirestore();
 
   renderTabla();
@@ -234,11 +344,12 @@ reiniciarBtn.addEventListener("click", async () => {
   actualizarGrafico();
 });
 
-// Guardar ingreso y meta cuando cambian
+// Guardar ingreso/meta cuando cambian
 ingresoInput.addEventListener("change", actualizarResumen);
 metaInput.addEventListener("change", actualizarResumen);
 
-// Cargar datos al iniciar la página
+// --- INICIALIZACIÓN ---
 document.addEventListener("DOMContentLoaded", () => {
-  cargarGastosDesdeFirestore();
+  // Inicialmente bloquea la app hasta login
+  bloquearApp();
 });
