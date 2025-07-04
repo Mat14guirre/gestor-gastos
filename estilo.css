@@ -17,9 +17,9 @@ h1 {
 }
 
 .saludo {
-  font-size: 1.4rem;
+  font-size: 20px;
   font-weight: 600;
-  padding: 0.5rem 1rem;
+  padding: 0.2rem 0.6rem;
   border-radius: 12px;
   display: inline-block;
   animation: fadeIn 0.6s ease-in-out;
@@ -97,14 +97,14 @@ textarea {
 
 /* Botones */
 button {
-  margin-top: 1.5rem;
+  
   background-color: #5b9bd5;
   color: white;
-  padding: 0.8rem 1.6rem;
+  padding: 0.3rem 0.5rem;
   border: none;
   border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 400;
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
 }

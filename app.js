@@ -58,10 +58,10 @@ function updateUI(user) {
     const saludoDiv = document.getElementById("saludo");
     if (saludoDiv) {
       if (user.email === "matias.aguirre269@gmail.com") {
-        saludoDiv.textContent = "Hola Mati 👋";
+        saludoDiv.textContent = "Mati👋";
         saludoDiv.className = "saludo mati";
         } else if (user.email === "florsaucedoo@gmail.com") {
-          saludoDiv.textContent = "Hola Flor 💖";
+          saludoDiv.textContent = "Flor💖";
           saludoDiv.className = "saludo flor";
           } else {
             saludoDiv.textContent = `Hola ${user.displayName || "usuario"} 👋`;
