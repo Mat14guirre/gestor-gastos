@@ -60,7 +60,7 @@ function updateUI(user) {
       if (user.email === "matias.aguirre269@gmail.com") {
         saludoDiv.textContent = "Mati👋";
         saludoDiv.className = "saludo mati";
-        document.body.style.background = "#e6ffed"; // fondo verdecito claro
+        document.body.style.background = "#a0d8ef"; // fondo verdecito claro
       } else if (user.email === "florsaucedoo@gmail.com") {
         saludoDiv.textContent = "Flor💖";
         saludoDiv.className = "saludo flor";
