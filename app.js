@@ -60,14 +60,17 @@ function updateUI(user) {
       if (user.email === "matias.aguirre269@gmail.com") {
         saludoDiv.textContent = "Mati👋";
         saludoDiv.className = "saludo mati";
-        } else if (user.email === "florsaucedoo@gmail.com") {
-          saludoDiv.textContent = "Flor💖";
-          saludoDiv.className = "saludo flor";
-          } else {
-            saludoDiv.textContent = `Hola ${user.displayName || "usuario"} 👋`;
-            saludoDiv.className = "saludo";
-          }
-    }
+        document.body.style.background = "#e6ffed"; // fondo verdecito claro
+      } else if (user.email === "florsaucedoo@gmail.com") {
+        saludoDiv.textContent = "Flor💖";
+        saludoDiv.className = "saludo flor";
+        document.body.style.background = "#ffe6f0"; // fondo rosita claro
+      } else {
+        saludoDiv.textContent = `Hola ${user.displayName || "usuario"} 👋`;
+        saludoDiv.className = "saludo";
+        document.body.style.background = "#f5f7fa"; // fondo neutro
+      } 
+  }
 
     loginBtn.style.display = "none";
     logoutBtn.style.display = "inline-block";
