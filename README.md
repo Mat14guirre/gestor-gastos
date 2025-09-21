@@ -7,7 +7,7 @@ Permite a dos usuarios (ej: pareja) llevar un registro compartido de ingresos y 
 
 ## 📸 Demo
 
-👉 [Enlace al deploy](https://tablero-de-gasto.netlify.app/) *(si lo tenés en Vercel, Netlify o Firebase Hosting)*  
+👉 https://tablero-de-gasto.netlify.app/
 
 ---
 
