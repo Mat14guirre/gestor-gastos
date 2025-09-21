@@ -13,10 +13,10 @@ Permite a dos usuarios (ej: pareja) llevar un registro compartido de ingresos y 
 
 ## 🛠️ Tecnologías utilizadas
 
-- ⚛️ React  
+- HTML
 - 🔥 Firebase (Auth + Firestore)  
-- 🧭 React Router  
-- 🎨 TailwindCSS  
+- JAVASCRIPT
+- CSS
 
 ---
 
