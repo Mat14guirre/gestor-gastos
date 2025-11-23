@@ -56,20 +56,25 @@ function updateUI(user) {
     usuarioActual = user;
 
     const saludoDiv = document.getElementById("saludo");
-    if (saludoDiv) {
-      if (user.email === "matias.aguirre269@gmail.com") {
-        saludoDiv.textContent = "Mati👋";
-        saludoDiv.className = "saludo mati";
-        document.body.style.background = "#a0d8ef"; // fondo verdecito claro
-      } else if (user.email === "florsaucedoo@gmail.com") {
-        saludoDiv.textContent = "Flor💖";
-        saludoDiv.className = "saludo flor";
-        document.body.style.background = "#ffe6f0"; // fondo rosita claro
-      } else {
-        saludoDiv.textContent = `Hola ${user.displayName || "usuario"} 👋`;
-        saludoDiv.className = "saludo";
-        document.body.style.background = "#f5f7fa"; // fondo neutro
-      } 
+if (saludoDiv) {
+  if (user.email === "matias.aguirre269@gmail.com") {
+    saludoDiv.textContent = "Mati";
+    saludoDiv.className = "saludo mati";
+    document.body.style.background = 
+      "linear-gradient(135deg, #1e3c72 0%, #2a5298 40%, #6db3f2 100%)";
+    
+  } else if (user.email === "florsaucedoo@gmail.com") {
+    saludoDiv.textContent = "Flor";
+    saludoDiv.className = "saludo flor";
+    document.body.style.background = 
+      "linear-gradient(135deg, #ffafcc 0%, #ff8fab 40%, #ffc8dd 100%)";
+
+  } else {
+    saludoDiv.textContent = `Hola ${user.displayName || "usuario"} 👋`;
+    saludoDiv.className = "saludo";
+    document.body.style.background =
+      "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 40%, #dee2e6 100%)";
+  }
   }
 
     loginBtn.style.display = "none";
